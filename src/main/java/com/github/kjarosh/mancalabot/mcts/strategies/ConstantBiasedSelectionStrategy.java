@@ -1,7 +1,6 @@
 package com.github.kjarosh.mancalabot.mcts.strategies;
 
 import com.github.kjarosh.mancalabot.mcts.MonteCarloTreeSearch;
-import com.github.kjarosh.mancalabot.mcts.Party;
 import com.github.kjarosh.mancalabot.mcts.SelectionStrategy;
 
 import java.util.ArrayList;
@@ -28,8 +27,8 @@ public class ConstantBiasedSelectionStrategy implements SelectionStrategy {
     public <S, M> MonteCarloTreeSearch<S, M>.Node select(Collection<MonteCarloTreeSearch<S, M>.Node> nodes) {
         Map<MonteCarloTreeSearch<S, M>.Node, Double> shares = new HashMap<>();
         for (MonteCarloTreeSearch<S, M>.Node node : nodes) {
-            double winProb = node.getWinProbability(Party.MAIN);
-            double share = (Double.isNaN(winProb) ? 0.5 : winProb) + bias;
+            double winProb = (double) node.getWon() / node.getTotal();
+            double share = (!Double.isFinite(winProb) ? 0.5 : winProb) + bias;
             shares.put(node, share);
         }
 

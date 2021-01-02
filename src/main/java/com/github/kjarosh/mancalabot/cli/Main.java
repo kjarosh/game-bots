@@ -13,11 +13,11 @@ import org.apache.commons.cli.ParseException;
 public class Main {
     public static void main(String[] args) throws ParseException {
         Options options = new Options();
-        options.addOption(null, "gui", false, "");
+        options.addOption(null, "nogui", false, "");
         DefaultParser parser = new DefaultParser();
         CommandLine cmd = parser.parse(options, args);
 
-        if (cmd.hasOption("gui")) {
+        if (!cmd.hasOption("nogui")) {
             MancalaGuiApplication.run();
         } else {
             System.err.println("Error: only GUI is supported");

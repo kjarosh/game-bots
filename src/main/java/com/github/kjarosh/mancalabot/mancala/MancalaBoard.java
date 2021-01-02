@@ -192,4 +192,8 @@ public class MancalaBoard {
         List<Move> possibleMoves = getPossibleMoves(player);
         return possibleMoves.get(random.nextInt(possibleMoves.size()));
     }
+
+    public MancalaConfig getConfig() {
+        return config;
+    }
 }

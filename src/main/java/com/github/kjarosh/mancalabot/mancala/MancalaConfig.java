@@ -18,4 +18,5 @@ public class MancalaConfig {
     private final int stones;
     private final int pits;
     private final boolean captureCapturingStone;
+    private final boolean playerStarts;
 }

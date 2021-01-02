@@ -40,7 +40,7 @@ class MancalaBotTest {
         board.setPit(Player.PLAYER_B, 5, 0);
 
         MancalaBotConfig botConfig = MancalaBotConfig.builder()
-                .maxMoveDuration(Duration.ofMillis(100))
+                .maxMoveDuration(Duration.ofMillis(500))
                 .build();
         MancalaBot bot = new MancalaBot(new Random(), botConfig);
 
@@ -74,7 +74,7 @@ class MancalaBotTest {
         board.setPit(Player.PLAYER_B, 5, 4);
 
         MancalaBotConfig botConfig = MancalaBotConfig.builder()
-                .maxMoveDuration(Duration.ofMillis(100))
+                .maxMoveDuration(Duration.ofMillis(500))
                 .build();
         MancalaBot bot = new MancalaBot(new Random(), botConfig);
 
