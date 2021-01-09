@@ -3,6 +3,7 @@ package com.github.kjarosh.mancalabot.mcts;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 
@@ -116,6 +117,11 @@ public class MonteCarloTreeSearch<S, M> {
         @Override
         public Party getParty() {
             return party;
+        }
+
+        @Override
+        public Optional<Node> getParent() {
+            return Optional.ofNullable(parent);
         }
 
         @Override

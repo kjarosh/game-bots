@@ -5,7 +5,7 @@ import com.github.kjarosh.mancalabot.mancala.Move;
 import com.github.kjarosh.mancalabot.mancala.Player;
 import com.github.kjarosh.mancalabot.mcts.MonteCarloTreeSearch;
 import com.github.kjarosh.mancalabot.mcts.Party;
-import com.github.kjarosh.mancalabot.mcts.strategies.ConstantBiasedSelectionStrategy;
+import com.github.kjarosh.mancalabot.mcts.strategies.UCTSelectionStrategy;
 import lombok.extern.slf4j.Slf4j;
 
 import java.time.Duration;
@@ -29,13 +29,13 @@ public class MancalaBot {
 
     public MovePrediction nextMove(MancalaBoard board, Player player) {
         MonteCarloTreeSearch<MancalaBoard, Move> mcts = new MonteCarloTreeSearch<>(
-                new ConstantBiasedSelectionStrategy(random, 0.5),
+                new UCTSelectionStrategy(random),
                 getHandler(player),
                 board);
 
         runSimulation(mcts);
 
-        double prob = 0;
+        double prob = -1d;
         Move move = null;
         Map<Move, Double> winProbabilities = mcts.getWinProbabilities(Party.MAIN);
         for (Map.Entry<Move, Double> entry : winProbabilities.entrySet()) {

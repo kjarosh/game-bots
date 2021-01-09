@@ -1,5 +1,7 @@
 package com.github.kjarosh.mancalabot.mcts;
 
+import java.util.Optional;
+
 /**
  * The MCTS node.
  *
@@ -20,4 +22,9 @@ public interface Node {
      * @return the party which is performing the move
      */
     Party getParty();
+
+    /**
+     * @return the parent node, or {@link Optional#empty()} if this is the root node
+     */
+    Optional<Node> getParent();
 }
