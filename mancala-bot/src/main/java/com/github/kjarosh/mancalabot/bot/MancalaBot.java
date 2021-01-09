@@ -9,6 +9,7 @@ import com.github.kjarosh.mancalabot.mancala.Player;
 import com.github.kjarosh.mancalabot.mcts.MonteCarloTreeSearch;
 import com.github.kjarosh.mancalabot.mcts.Party;
 import com.github.kjarosh.mancalabot.mcts.strategies.UCTSelectionStrategy;
+import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.Map;
@@ -34,6 +35,7 @@ public class MancalaBot {
         }
     }
 
+    @SneakyThrows
     public MovePrediction nextMove(MancalaBoard board, Player player) {
         MonteCarloTreeSearch<MancalaBoard, Move> mcts = new MonteCarloTreeSearch<>(
                 new UCTSelectionStrategy(random),

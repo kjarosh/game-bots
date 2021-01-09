@@ -5,6 +5,7 @@ import com.github.kjarosh.mancalabot.mancala.MancalaConfig;
 import com.github.kjarosh.mancalabot.mancala.Move;
 import com.github.kjarosh.mancalabot.mancala.Player;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
 
 import java.util.Random;
 
@@ -14,6 +15,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 /**
  * @author Kamil Jarosz
  */
+@TestInstance(TestInstance.Lifecycle.PER_METHOD)
 class MancalaBotTest {
     private final Random random = new Random(12);
 

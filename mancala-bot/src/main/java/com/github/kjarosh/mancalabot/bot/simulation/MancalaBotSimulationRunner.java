@@ -8,5 +8,5 @@ import com.github.kjarosh.mancalabot.mcts.MonteCarloTreeSearch;
  * @author Kamil Jarosz
  */
 public interface MancalaBotSimulationRunner {
-    void run(MonteCarloTreeSearch<MancalaBoard, Move> mcts);
+    void run(MonteCarloTreeSearch<MancalaBoard, Move> mcts) throws InterruptedException;
 }

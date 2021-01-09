@@ -8,32 +8,36 @@ import lombok.extern.slf4j.Slf4j;
 
 import java.time.Duration;
 import java.time.Instant;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 
 /**
  * @author Kamil Jarosz
  */
 @Slf4j
 public class ConcurrentMancalaBotSimulationRunner implements MancalaBotSimulationRunner {
+    private final ExecutorService executor;
     private final MancalaBotConfig config;
 
     public ConcurrentMancalaBotSimulationRunner(MancalaBotConfig config) {
         this.config = config;
+        this.executor = Executors.newFixedThreadPool(config.getThreads(), new SimulationThreadFactory());
+        log.info("Created a pool of threads for concurrent simulation (" + config.getThreads() + ")");
     }
 
     @Override
-    public void run(MonteCarloTreeSearch<MancalaBoard, Move> mcts) {
-        log.info("Starting worker threads (" + config.getThreads() + ")");
-        SimulationThread[] threads = new SimulationThread[config.getThreads()];
-        for (int i = 0; i < threads.length; ++i) {
-            threads[i] = new SimulationThread(i, mcts::nextRound);
-        }
-
-        for (SimulationThread thread : threads) {
-            thread.start();
-        }
-        log.info("Worker threads started");
-
+    public void run(MonteCarloTreeSearch<MancalaBoard, Move> mcts) throws InterruptedException {
         Instant deadline = Instant.now().plus(config.getMaxMoveDuration());
+
+        List<Future<?>> futures = new ArrayList<>(config.getThreads());
+        for (int i = 0; i < config.getThreads(); ++i) {
+            Future<?> future = executor.submit(() -> runInWorkerThread(mcts));
+            futures.add(future);
+        }
 
         try {
             while (Instant.now().isBefore(deadline)) {
@@ -43,26 +47,35 @@ public class ConcurrentMancalaBotSimulationRunner implements MancalaBotSimulatio
                     Thread.sleep(tillDeadline.toMillis());
                 } else {
                     Thread.sleep(1000);
-                    log.info("Remaining seconds: " + tillDeadline.toSeconds());
+                    log.info("Remaining time: " +
+                            tillDeadline.toSeconds() + "." +
+                            tillDeadline.toMillis() % 1000);
                 }
             }
         } catch (InterruptedException e) {
-            log.info("Interrupted");
-            Thread.currentThread().interrupt();
+            log.warn("Interrupted while running simulation");
+            throw e;
         }
 
-        log.info("Finishing worker threads");
-        for (SimulationThread thread : threads) {
-            thread.interrupt();
+        for (Future<?> future : futures) {
+            future.cancel(true);
         }
 
-        try {
-            for (SimulationThread thread : threads) {
-                thread.join();
+        for (Future<?> future : futures) {
+            try {
+                future.get();
+            } catch (InterruptedException e) {
+                log.warn("Interrupted while waiting for worker threads");
+                throw e;
+            } catch (ExecutionException e) {
+                throw new RuntimeException(e);
             }
-        } catch (InterruptedException e) {
-            log.info("Interrupted");
-            Thread.currentThread().interrupt();
+        }
+    }
+
+    private void runInWorkerThread(MonteCarloTreeSearch<MancalaBoard, Move> mcts) {
+        while (!Thread.interrupted()) {
+            mcts.nextRound();
         }
     }
 }
