@@ -15,8 +15,12 @@ import lombok.ToString;
 @EqualsAndHashCode
 @ToString
 public class MancalaConfig {
-    private final int stones;
-    private final int pits;
-    private final boolean captureCapturingStone;
-    private final boolean playerStarts;
+    @Builder.Default
+    private final int stones = 4;
+    @Builder.Default
+    private final int pits = 6;
+    @Builder.Default
+    private final boolean captureCapturingStone = true;
+    @Builder.Default
+    private final boolean playerStarts = false;
 }

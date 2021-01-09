@@ -10,7 +10,7 @@ import java.time.Duration;
 import java.util.Random;
 
 import static com.github.kjarosh.mancalabot.mancala.Player.PLAYER_A;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * @author Kamil Jarosz
@@ -23,7 +23,7 @@ class MancalaBotTest {
                 .stones(4)
                 .captureCapturingStone(true)
                 .build();
-        MancalaBoard board = new MancalaBoard(config);
+        MancalaBoard board = MancalaBoard.create(config);
 
         board.setPit(PLAYER_A, 0, 1);
         board.setPit(PLAYER_A, 1, 1);
@@ -57,7 +57,7 @@ class MancalaBotTest {
                 .stones(4)
                 .captureCapturingStone(true)
                 .build();
-        MancalaBoard board = new MancalaBoard(config);
+        MancalaBoard board = MancalaBoard.create(config);
 
         board.setPit(PLAYER_A, 0, 4);
         board.setPit(PLAYER_A, 1, 4);

@@ -34,7 +34,7 @@ public class MancalaGameWindow extends Stage {
     private final MancalaBoardGui mancalaBoardGui;
 
     public MancalaGameWindow(MancalaConfig config, MancalaBotConfig botConfig) {
-        this.board = new SimpleObjectProperty<>(new MancalaBoard(config));
+        this.board = new SimpleObjectProperty<>(MancalaBoard.create(config));
         this.lastPrediction = new SimpleObjectProperty<>(null);
         this.bot = new MancalaBot(new Random(), botConfig);
 
