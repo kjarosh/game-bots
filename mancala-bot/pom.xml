@@ -63,22 +63,42 @@
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-assembly-plugin</artifactId>
-
+                <artifactId>maven-jar-plugin</artifactId>
                 <configuration>
                     <archive>
                         <manifest>
-                            <mainClass>com.github.kjarosh.mancalabot.cli.Main</mainClass>
+                            <addClasspath>true</addClasspath>
+                            <mainClass>com.github.kjarosh.mancalabot.gui.MainGui</mainClass>
+                            <classpathPrefix>lib/</classpathPrefix>
+                            <classpathLayoutType>repository</classpathLayoutType>
                         </manifest>
                     </archive>
-                    <descriptorRefs>
-                        <descriptorRef>jar-with-dependencies</descriptorRef>
-                    </descriptorRefs>
                 </configuration>
-
+            </plugin>
+            <plugin>
+                <groupId>com.hubspot.maven.plugins</groupId>
+                <artifactId>slimfast-plugin</artifactId>
+                <version>0.18</version>
                 <executions>
                     <execution>
-                        <id>make-assembly</id>
+                        <goals>
+                            <goal>copy</goal>
+                        </goals>
+                        <phase>package</phase>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-assembly-plugin</artifactId>
+                <configuration>
+                    <descriptors>
+                        <descriptor>src/assembly/dist.xml</descriptor>
+                    </descriptors>
+                    <finalName>mancala-bot-${pom.version}</finalName>
+                </configuration>
+                <executions>
+                    <execution>
                         <phase>package</phase>
                         <goals>
                             <goal>single</goal>

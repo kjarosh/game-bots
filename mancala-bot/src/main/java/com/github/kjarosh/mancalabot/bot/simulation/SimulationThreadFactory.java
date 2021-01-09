@@ -13,6 +13,7 @@ class SimulationThreadFactory implements ThreadFactory {
     public Thread newThread(Runnable r) {
         Thread thread = new Thread(r);
         thread.setName("simulation-" + counter.incrementAndGet());
+        thread.setDaemon(true);
         return thread;
     }
 }

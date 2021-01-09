@@ -7,8 +7,8 @@ import javafx.stage.Stage;
  * @author Kamil Jarosz
  */
 public class MancalaGuiApplication extends Application {
-    public static void run() {
-        Application.launch();
+    public static void run(String[] args) {
+        Application.launch(args);
     }
 
     @Override

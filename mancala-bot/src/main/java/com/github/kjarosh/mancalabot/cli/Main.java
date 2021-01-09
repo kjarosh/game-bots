@@ -1,6 +1,5 @@
 package com.github.kjarosh.mancalabot.cli;
 
-import com.github.kjarosh.mancalabot.gui.MancalaGuiApplication;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.DefaultParser;
 import org.apache.commons.cli.HelpFormatter;
@@ -17,12 +16,8 @@ public class Main {
         DefaultParser parser = new DefaultParser();
         CommandLine cmd = parser.parse(options, args);
 
-        if (!cmd.hasOption("nogui")) {
-            MancalaGuiApplication.run();
-        } else {
-            System.err.println("Error: only GUI is supported");
-            new HelpFormatter().printHelp("program", options);
-            System.exit(1);
-        }
+        System.err.println("Error: only GUI is supported");
+        new HelpFormatter().printHelp("program", options);
+        System.exit(1);
     }
 }
