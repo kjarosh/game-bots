@@ -3,8 +3,17 @@ package com.github.kjarosh.mancalabot.mcts;
 import java.util.Collection;
 
 /**
+ * The selection strategy to apply when choosing MCTS nodes to simulate playouts.
+ *
  * @author Kamil Jarosz
  */
 public interface SelectionStrategy {
-    <S, M> MonteCarloTreeSearch<S, M>.Node select(Collection<MonteCarloTreeSearch<S, M>.Node> nodes);
+    /**
+     * Choose one of the given nodes by some criteria.
+     *
+     * @param nodes nodes to choose from
+     * @param <N>   concrete node type
+     * @return the chosen node
+     */
+    <N extends Node> N select(Collection<N> nodes);
 }

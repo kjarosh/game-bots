@@ -15,7 +15,7 @@ public class MonteCarloTreeSearch<S, M> {
     private final MonteCarloTreeSearchHandler<S, M> handler;
     private final SelectionStrategy selectionStrategy;
 
-    private final Node root;
+    private final InternalNode root;
 
     public MonteCarloTreeSearch(
             SelectionStrategy selectionStrategy,
@@ -23,12 +23,12 @@ public class MonteCarloTreeSearch<S, M> {
             S state) {
         this.selectionStrategy = selectionStrategy;
         this.handler = handler;
-        this.root = new Node(null, Party.MAIN, state);
+        this.root = new InternalNode(null, Party.MAIN, state);
     }
 
     public void nextRound() {
         // selection
-        Node leaf = this.root.selectLeaf();
+        InternalNode leaf = this.root.selectLeaf();
 
         // expansion
         if (leaf.total.get() > 0) leaf.expandChildren();
@@ -62,10 +62,10 @@ public class MonteCarloTreeSearch<S, M> {
         return 1d * root.sumDepths() / root.countLeaves();
     }
 
-    public class Node {
-        private final Node parent;
+    private class InternalNode implements Node {
+        private final InternalNode parent;
         private final Party party;
-        private final Map<M, Node> children = new HashMap<>();
+        private final Map<M, InternalNode> children = new HashMap<>();
         private final S state;
 
         private final AtomicLong won = new AtomicLong(0);
@@ -73,7 +73,7 @@ public class MonteCarloTreeSearch<S, M> {
 
         private volatile boolean expanded = false;
 
-        private Node(Node parent, Party party, S state) {
+        private InternalNode(InternalNode parent, Party party, S state) {
             this.state = state;
             this.parent = parent;
             this.party = party;
@@ -86,18 +86,18 @@ public class MonteCarloTreeSearch<S, M> {
 
                 handler.possibleMoves(state, party).forEach(move -> {
                     S newState = handler.applyMove(state, move);
-                    Node child = new Node(this, party.opponent(), newState);
+                    InternalNode child = new InternalNode(this, party.opponent(), newState);
                     children.put(move, child);
                 });
                 expanded = true;
             }
         }
 
-        private Node selectLeaf() {
+        private InternalNode selectLeaf() {
             if (!expanded) return this;
             if (children.size() == 0) return this;
 
-            Node selectedChild = selectionStrategy.select(
+            InternalNode selectedChild = selectionStrategy.select(
                     Collections.unmodifiableCollection(children.values()));
             return selectedChild.selectLeaf();
         }
@@ -113,15 +113,22 @@ public class MonteCarloTreeSearch<S, M> {
             }
         }
 
+        @Override
+        public Party getParty() {
+            return party;
+        }
+
+        @Override
         public long getWon() {
             return won.get();
         }
 
+        @Override
         public long getTotal() {
             return total.get();
         }
 
-        public double getWinProbability(Party party) {
+        private double getWinProbability(Party party) {
             double p = 1d * won.get() / total.get();
             if (this.party != party) {
                 return 1 - p;
@@ -144,7 +151,7 @@ public class MonteCarloTreeSearch<S, M> {
         public long sumDepths() {
             return children.size() + children.values()
                     .stream()
-                    .mapToLong(Node::sumDepths)
+                    .mapToLong(InternalNode::sumDepths)
                     .sum();
         }
 
@@ -153,7 +160,7 @@ public class MonteCarloTreeSearch<S, M> {
 
             return children.values()
                     .stream()
-                    .mapToLong(Node::countLeaves)
+                    .mapToLong(InternalNode::countLeaves)
                     .sum();
         }
     }
