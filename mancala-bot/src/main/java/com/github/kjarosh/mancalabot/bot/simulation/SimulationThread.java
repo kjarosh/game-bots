@@ -1,4 +1,4 @@
-package com.github.kjarosh.mancalabot.bot;
+package com.github.kjarosh.mancalabot.bot.simulation;
 
 /**
  * @author Kamil Jarosz

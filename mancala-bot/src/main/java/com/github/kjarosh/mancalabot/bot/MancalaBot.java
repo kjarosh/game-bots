@@ -1,5 +1,8 @@
 package com.github.kjarosh.mancalabot.bot;
 
+import com.github.kjarosh.mancalabot.bot.simulation.ConcurrentMancalaBotSimulationRunner;
+import com.github.kjarosh.mancalabot.bot.simulation.MancalaBotSimulationRunner;
+import com.github.kjarosh.mancalabot.bot.simulation.SequentialMancalaBotSimulationRunner;
 import com.github.kjarosh.mancalabot.mancala.MancalaBoard;
 import com.github.kjarosh.mancalabot.mancala.Move;
 import com.github.kjarosh.mancalabot.mancala.Player;
@@ -8,8 +11,6 @@ import com.github.kjarosh.mancalabot.mcts.Party;
 import com.github.kjarosh.mancalabot.mcts.strategies.UCTSelectionStrategy;
 import lombok.extern.slf4j.Slf4j;
 
-import java.time.Duration;
-import java.time.Instant;
 import java.util.Map;
 import java.util.Random;
 
@@ -20,11 +21,17 @@ import java.util.Random;
 public class MancalaBot {
     private final Random random;
     private final MancalaBotConfig config;
+    private final MancalaBotSimulationRunner simulationRunner;
 
     public MancalaBot(Random random, MancalaBotConfig config) {
         this.random = random;
         this.config = config;
         this.config.validate();
+        if (config.isSequentialMode()) {
+            this.simulationRunner = new SequentialMancalaBotSimulationRunner(config);
+        } else {
+            this.simulationRunner = new ConcurrentMancalaBotSimulationRunner(config);
+        }
     }
 
     public MovePrediction nextMove(MancalaBoard board, Player player) {
@@ -33,7 +40,7 @@ public class MancalaBot {
                 getHandler(player),
                 board);
 
-        runSimulation(mcts);
+        simulationRunner.run(mcts);
 
         double prob = -1d;
         Move move = null;
@@ -54,51 +61,6 @@ public class MancalaBot {
                 .treeDepthMax(mcts.getMaxDepth())
                 .treeDepthAvg(mcts.getAverageDepth())
                 .build();
-    }
-
-    private void runSimulation(MonteCarloTreeSearch<MancalaBoard, Move> mcts) {
-        log.info("Starting worker threads (" + config.getThreads() + ")");
-        SimulationThread[] threads = new SimulationThread[config.getThreads()];
-        for (int i = 0; i < threads.length; ++i) {
-            threads[i] = new SimulationThread(i, mcts::nextRound);
-        }
-
-        for (SimulationThread thread : threads) {
-            thread.start();
-        }
-        log.info("Worker threads started");
-
-        Instant deadline = Instant.now().plus(config.getMaxMoveDuration());
-
-        try {
-            while (Instant.now().isBefore(deadline)) {
-                Duration tillDeadline = Duration.between(Instant.now(), deadline);
-
-                if (tillDeadline.toMillis() < 1000) {
-                    Thread.sleep(tillDeadline.toMillis());
-                } else {
-                    Thread.sleep(1000);
-                    log.info("Remaining seconds: " + tillDeadline.toSeconds());
-                }
-            }
-        } catch (InterruptedException e) {
-            log.info("Interrupted");
-            Thread.currentThread().interrupt();
-        }
-
-        log.info("Finishing worker threads");
-        for (SimulationThread thread : threads) {
-            thread.interrupt();
-        }
-
-        try {
-            for (SimulationThread thread : threads) {
-                thread.join();
-            }
-        } catch (InterruptedException e) {
-            log.info("Interrupted");
-            Thread.currentThread().interrupt();
-        }
     }
 
     private MancalaMonteCarloTreeSearchHandler getHandler(Player player) {

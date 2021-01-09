@@ -60,7 +60,7 @@ public class MancalaGameWindow extends Stage {
     private void onPlayerMove(Move move) {
         MancalaBoard board = this.board.get();
 
-        if (board.isEnded()) {
+        if (!board.hasMove(move.getPlayer())) {
             log.info("Cannot perform move: game ended");
             return;
         }
@@ -81,7 +81,7 @@ public class MancalaGameWindow extends Stage {
     }
 
     private void onBotMove() {
-        if (turn.get() == Player.PLAYER_B && !board.get().isEnded()) {
+        if (turn.get() == Player.PLAYER_B && board.get().hasMove(Player.PLAYER_B)) {
             MovePrediction movePrediction = bot.nextMove(board.get(), Player.PLAYER_B);
 
             Platform.runLater(() -> {
@@ -92,20 +92,16 @@ public class MancalaGameWindow extends Stage {
     }
 
     private void performMove(Move move) {
-        boolean endedBefore = board.get().isEnded();
-//        Timeline tl = new Timeline(
-//                new KeyFrame(Duration.seconds(1),
-//                        event -> mancalaBoardGui.visualizeMove(move)),
-//                new KeyFrame(Duration.seconds(1),
-//                        event -> {
-        board.set(board.get().move(move));
-        turn.set(turn.get().opponent());
-        boolean endedAfter = board.get().isEnded();
-//                        }));
-//        tl.setCycleCount(1);
-//        tl.play();
+        if (move.getPlayer() != turn.get()) {
+            throw new IllegalStateException("Wrong player");
+        }
 
-        if (!endedBefore && endedAfter) {
+        board.set(board.get().move(move));
+        Player nextPlayer = turn.get().opponent();
+        turn.set(nextPlayer);
+
+        boolean ended = !board.get().hasMove(nextPlayer);
+        if (ended) {
             new ResultPopup(board.get().resultFor(Player.PLAYER_A)).showAndWait();
         }
     }

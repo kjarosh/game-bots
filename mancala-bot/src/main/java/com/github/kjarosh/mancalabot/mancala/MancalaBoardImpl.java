@@ -13,6 +13,7 @@ import java.util.Random;
  * @author Kamil Jarosz
  */
 class MancalaBoardImpl implements MancalaBoard {
+    private final MovePerformer movePerformer;
     private final MancalaConfig config;
 
     private final int[] pitsA;
@@ -27,6 +28,7 @@ class MancalaBoardImpl implements MancalaBoard {
 
     MancalaBoardImpl(MancalaConfig config) {
         this.config = config;
+        this.movePerformer = new MovePerformer(this);
         this.pitsA = new int[config.getPits()];
         this.pitsB = new int[config.getPits()];
 
@@ -35,6 +37,7 @@ class MancalaBoardImpl implements MancalaBoard {
 
     MancalaBoardImpl(MancalaBoardImpl other) {
         this.config = other.config;
+        this.movePerformer = new MovePerformer(this);
         this.mancalaA = other.mancalaA;
         this.mancalaB = other.mancalaB;
         this.pitsA = Arrays.copyOf(other.pitsA, other.pitsA.length);
@@ -122,10 +125,6 @@ class MancalaBoardImpl implements MancalaBoard {
 
     @Override
     public MancalaBoard move(Move move) {
-        if (isEnded()) {
-            throw new IllegalStateException("Ended game");
-        }
-
         MancalaBoard copy = copy();
         copy.moveInPlace(move);
         return copy;
@@ -133,13 +132,16 @@ class MancalaBoardImpl implements MancalaBoard {
 
     @Override
     public void moveInPlace(Move move) {
-        new MovePerformer(this).moveInPlace(move);
+        movePerformer.moveInPlace(move);
     }
 
     @Override
-    public boolean isEnded() {
-        return Arrays.stream(pitsA).allMatch(v -> v == 0)
-                || Arrays.stream(pitsB).allMatch(v -> v == 0);
+    public boolean hasMove(Player player) {
+        if (player == Player.PLAYER_A) {
+            return !Arrays.stream(pitsA).allMatch(v -> v == 0);
+        } else {
+            return !Arrays.stream(pitsB).allMatch(v -> v == 0);
+        }
     }
 
     @Override
@@ -153,10 +155,6 @@ class MancalaBoardImpl implements MancalaBoard {
 
     @Override
     public List<Move> getPossibleMoves(Player player) {
-        if (isEnded()) {
-            return Collections.emptyList();
-        }
-
         List<Move> possibleMoves = new ArrayList<>();
         for (int i = 0; i < config.getPits(); ++i) {
             if (getPit(player, i) > 0) {

@@ -6,7 +6,6 @@ import com.github.kjarosh.mancalabot.mancala.Move;
 import com.github.kjarosh.mancalabot.mancala.Player;
 import org.junit.jupiter.api.Test;
 
-import java.time.Duration;
 import java.util.Random;
 
 import static com.github.kjarosh.mancalabot.mancala.Player.PLAYER_A;
@@ -16,6 +15,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  * @author Kamil Jarosz
  */
 class MancalaBotTest {
+    private final Random random = new Random(12);
+
     @Test
     void instantWin() {
         MancalaConfig config = MancalaConfig.builder()
@@ -40,9 +41,10 @@ class MancalaBotTest {
         board.setPit(Player.PLAYER_B, 5, 0);
 
         MancalaBotConfig botConfig = MancalaBotConfig.builder()
-                .maxMoveDuration(Duration.ofMillis(500))
+                .sequentialMode(true)
+                .iterations(1000)
                 .build();
-        MancalaBot bot = new MancalaBot(new Random(), botConfig);
+        MancalaBot bot = new MancalaBot(random, botConfig);
 
         MovePrediction prediction = bot.nextMove(board, PLAYER_A);
         System.out.println(prediction);
@@ -74,9 +76,10 @@ class MancalaBotTest {
         board.setPit(Player.PLAYER_B, 5, 4);
 
         MancalaBotConfig botConfig = MancalaBotConfig.builder()
-                .maxMoveDuration(Duration.ofMillis(500))
+                .sequentialMode(true)
+                .iterations(1000)
                 .build();
-        MancalaBot bot = new MancalaBot(new Random(), botConfig);
+        MancalaBot bot = new MancalaBot(random, botConfig);
 
         MovePrediction prediction = bot.nextMove(board, PLAYER_A);
         System.out.println(prediction);

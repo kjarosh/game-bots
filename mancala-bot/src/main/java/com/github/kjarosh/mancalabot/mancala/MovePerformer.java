@@ -25,6 +25,9 @@ class MovePerformer {
         }
 
         int stones = board.getPit(player, pit);
+        if (stones <= 0) {
+            throw new IllegalArgumentException("Illegal move: no stones at pit " + pit);
+        }
         board.setPit(player, pit, 0);
         placeStones(player, player, pit + 1, stones);
     }

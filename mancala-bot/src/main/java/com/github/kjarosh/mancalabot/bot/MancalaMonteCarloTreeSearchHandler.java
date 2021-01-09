@@ -37,7 +37,7 @@ public class MancalaMonteCarloTreeSearchHandler implements MonteCarloTreeSearchH
         MancalaBoard sim = state.copy();
         Player current = party == Party.MAIN ? player : player.opponent();
 
-        while (!sim.isEnded()) {
+        while (sim.hasMove(current)) {
             Move move = sim.randomMove(current, random);
             sim.moveInPlace(move);
             current = current.opponent();
