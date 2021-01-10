@@ -39,6 +39,8 @@ public interface MancalaBoard {
 
     void moveInPlace(Move move);
 
+    boolean isFinished();
+
     boolean hasMove(Player player);
 
     Result resultFor(Player player);

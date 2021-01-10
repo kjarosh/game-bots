@@ -60,7 +60,7 @@ public class MancalaGameWindow extends Stage {
     private void onPlayerMove(Move move) {
         MancalaBoard board = this.board.get();
 
-        if (!board.hasMove(move.getPlayer())) {
+        if (board.isFinished()) {
             log.info("Cannot perform move: game ended");
             return;
         }
@@ -81,7 +81,7 @@ public class MancalaGameWindow extends Stage {
     }
 
     private void onBotMove() {
-        if (turn.get() == Player.PLAYER_B && board.get().hasMove(Player.PLAYER_B)) {
+        if (turn.get() == Player.PLAYER_B && !board.get().isFinished()) {
             MovePrediction movePrediction = bot.nextMove(board.get(), Player.PLAYER_B);
 
             Platform.runLater(() -> {
@@ -100,7 +100,7 @@ public class MancalaGameWindow extends Stage {
         Player nextPlayer = turn.get().opponent();
         turn.set(nextPlayer);
 
-        boolean ended = !board.get().hasMove(nextPlayer);
+        boolean ended = board.get().isFinished();
         if (ended) {
             new ResultPopup(board.get().resultFor(Player.PLAYER_A)).showAndWait();
         }

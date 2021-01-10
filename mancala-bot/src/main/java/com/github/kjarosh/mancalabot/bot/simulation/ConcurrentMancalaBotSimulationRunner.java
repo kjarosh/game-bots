@@ -35,30 +35,30 @@ public class ConcurrentMancalaBotSimulationRunner implements MancalaBotSimulatio
 
         List<Future<?>> futures = new ArrayList<>(config.getThreads());
         for (int i = 0; i < config.getThreads(); ++i) {
-            Future<?> future = executor.submit(() -> runInWorkerThread(mcts));
+            Future<?> future = executor.submit(() -> runInWorkerThread(mcts, deadline));
             futures.add(future);
         }
 
         try {
-            while (Instant.now().isBefore(deadline)) {
+            while (futures.stream().anyMatch(f -> !f.isDone())) {
                 Duration tillDeadline = Duration.between(Instant.now(), deadline);
 
-                if (tillDeadline.toMillis() < 1000) {
+                if (tillDeadline.toMillis() <= 0) {
+                    break;
+                }
+
+                log.info("Remaining time: " +
+                        tillDeadline.toSeconds() + "." +
+                        tillDeadline.toMillis() % 1000 + "s");
+                if (tillDeadline.toMillis() < 650) {
                     Thread.sleep(tillDeadline.toMillis());
                 } else {
-                    Thread.sleep(1000);
-                    log.info("Remaining time: " +
-                            tillDeadline.toSeconds() + "." +
-                            tillDeadline.toMillis() % 1000);
+                    Thread.sleep(650);
                 }
             }
         } catch (InterruptedException e) {
             log.warn("Interrupted while running simulation");
             throw e;
-        }
-
-        for (Future<?> future : futures) {
-            future.cancel(true);
         }
 
         for (Future<?> future : futures) {
@@ -73,9 +73,11 @@ public class ConcurrentMancalaBotSimulationRunner implements MancalaBotSimulatio
         }
     }
 
-    private void runInWorkerThread(MonteCarloTreeSearch<MancalaBoard, Move> mcts) {
-        while (!Thread.interrupted()) {
-            mcts.nextRound();
+    private void runInWorkerThread(MonteCarloTreeSearch<MancalaBoard, Move> mcts, Instant deadline) {
+        while (Instant.now().isBefore(deadline)) {
+            for (int i = 0; i < 10; ++i) {
+                mcts.nextRound();
+            }
         }
     }
 }

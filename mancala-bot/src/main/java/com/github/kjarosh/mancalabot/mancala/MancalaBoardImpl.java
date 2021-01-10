@@ -5,7 +5,6 @@ import lombok.Setter;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 
@@ -133,6 +132,11 @@ class MancalaBoardImpl implements MancalaBoard {
     @Override
     public void moveInPlace(Move move) {
         movePerformer.moveInPlace(move);
+    }
+
+    @Override
+    public boolean isFinished() {
+        return !hasMove(Player.PLAYER_A) || !hasMove(Player.PLAYER_B);
     }
 
     @Override
