@@ -26,7 +26,7 @@ public class MonteCarloTreeSearch<S, M> {
             S state) {
         this.selectionStrategy = selectionStrategy;
         this.handler = handler;
-        this.root = new InternalNode(null, Party.MAIN, state);
+        this.root = new InternalNode(null, Party.OPPONENT, state);
     }
 
     public void nextRound() {
@@ -34,22 +34,22 @@ public class MonteCarloTreeSearch<S, M> {
         InternalNode leaf = this.root.selectLeaf();
 
         // expansion
-        if (leaf.total.get() > 0) leaf.expandChildren();
+        leaf.expandChildren();
 
         // simulation
-        Outcome outcome = handler.simulatePlayout(leaf.state, leaf.party);
+        Outcome outcome = handler.simulatePlayout(leaf.state, leaf.party.opponent());
 
         // backpropagation
         leaf.backpropagate(outcome);
     }
 
     public M getBestMove() {
-        long maxTotal = -1;
+        double maxEvaluated = Double.NEGATIVE_INFINITY;
         M move = null;
         for (Map.Entry<M, InternalNode> e : root.children.entrySet()) {
-            long total = e.getValue().getTotal();
-            if (total > maxTotal) {
-                maxTotal = total;
+            double evaluated = selectionStrategy.evaluateFinal(e.getValue());
+            if (evaluated > maxEvaluated) {
+                maxEvaluated = evaluated;
                 move = e.getKey();
             }
         }
@@ -62,6 +62,12 @@ public class MonteCarloTreeSearch<S, M> {
 
     public double getWinProbabilityAfterMove(M move, Party party) {
         return root.children.get(move).getWinProbability(party);
+    }
+
+    public Map<M, Double> getWinProbabilities(Party party) {
+        Map<M, Double> prob = new HashMap<>();
+        root.children.forEach((move, node) -> prob.put(move, node.getWinProbability(party)));
+        return prob;
     }
 
     public long getTotalSimulations() {
@@ -98,9 +104,10 @@ public class MonteCarloTreeSearch<S, M> {
             synchronized (children) {
                 if (expanded) return;
 
-                handler.possibleMoves(state, party).forEach(move -> {
+                Party movePerformer = party.opponent();
+                handler.possibleMoves(state, movePerformer).forEach(move -> {
                     S newState = handler.applyMove(state, move);
-                    InternalNode child = new InternalNode(this, party.opponent(), newState);
+                    InternalNode child = new InternalNode(this, movePerformer, newState);
                     children.put(move, child);
                 });
                 expanded = true;
@@ -117,16 +124,16 @@ public class MonteCarloTreeSearch<S, M> {
         }
 
         private void backpropagate(Outcome outcome) {
+            if (parent != null) {
+                parent.backpropagate(outcome);
+            }
+
             if (party == outcome.getWinner()) {
                 won.addAndGet(1d);
             } else if (outcome == Outcome.TIE) {
                 won.addAndGet(0.5d);
             }
             total.incrementAndGet();
-
-            if (parent != null) {
-                parent.backpropagate(outcome);
-            }
         }
 
         @Override

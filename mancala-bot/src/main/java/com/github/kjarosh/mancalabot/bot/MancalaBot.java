@@ -38,7 +38,7 @@ public class MancalaBot {
     @SneakyThrows
     public MovePrediction nextMove(MancalaBoard board, Player player) {
         MonteCarloTreeSearch<MancalaBoard, Move> mcts = new MonteCarloTreeSearch<>(
-                new UCTSelectionStrategy(random),
+                new UCTSelectionStrategy(random, 0.5),
                 getHandler(player),
                 board);
 

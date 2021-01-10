@@ -25,4 +25,9 @@ public class PureRandomSelectionStrategy implements SelectionStrategy {
         List<N> nodeList = new ArrayList<>(nodes);
         return nodeList.get(random.nextInt(nodeList.size()));
     }
+
+    @Override
+    public double evaluateFinal(Node value) {
+        return value.getWon() / value.getTotal();
+    }
 }

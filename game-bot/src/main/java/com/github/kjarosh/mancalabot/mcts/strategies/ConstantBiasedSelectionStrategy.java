@@ -1,6 +1,5 @@
 package com.github.kjarosh.mancalabot.mcts.strategies;
 
-import com.github.kjarosh.mancalabot.mcts.MonteCarloTreeSearch;
 import com.github.kjarosh.mancalabot.mcts.Node;
 import com.github.kjarosh.mancalabot.mcts.SelectionStrategy;
 
@@ -55,5 +54,10 @@ public class ConstantBiasedSelectionStrategy implements SelectionStrategy {
         }
 
         throw new AssertionError("" + shares);
+    }
+
+    @Override
+    public double evaluateFinal(Node value) {
+        return value.getWon() / value.getTotal();
     }
 }

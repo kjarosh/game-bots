@@ -16,4 +16,14 @@ public interface SelectionStrategy {
      * @return the chosen node
      */
     <N extends Node> N select(Collection<N> nodes);
+
+    /**
+     * Evaluate top-level nodes to select the answer.
+     *
+     * @param node node to evaluate
+     * @return evaluated number, grater is better
+     */
+    default double evaluateFinal(Node node) {
+        return node.getTotal();
+    }
 }

@@ -26,7 +26,7 @@ public class MancalaGameStatsGui extends GridPane {
         MancalaBoard board = this.board.get();
         getChildren().clear();
 
-        boolean ended = !board.isFinished();
+        boolean ended = board.isFinished();
         Result result = board.resultFor(Player.PLAYER_A);
         addRow(0, new Text("Game result:"), new Text(!ended ? "in progress" : resultToString(result)));
         addRow(1, new Text("Turn:"), new Text(turn.get() == Player.PLAYER_A ? "You" : "Bot"));

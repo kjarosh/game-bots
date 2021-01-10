@@ -37,11 +37,6 @@ public class UCTSelectionStrategy implements SelectionStrategy {
         double max = -1d;
         for (N node : nodes) {
             double value = evaluate(node);
-
-            if (!(value >= 0)) {
-                throw new AssertionError();
-            }
-
             if (value == max) {
                 results.add(node);
             } else if (value > max) {
@@ -61,13 +56,23 @@ public class UCTSelectionStrategy implements SelectionStrategy {
                 .map(i -> Math.max(0, i))
                 .orElse(1L);
 
-        if (n == 0) {
+        if (n == 0 || N == 0) {
             return 1;
         }
 
         double exploitation = w / n;
         double exploration = explorationFactor * Math.sqrt(Math.log(N) / n);
 
-        return exploitation + exploration;
+        double value = exploitation + exploration;
+        if (!(value >= 0)) {
+            throw new AssertionError(value + ", " +
+                    "n=" + n + ", " +
+                    "w=" + w + ", " +
+                    "N=" + N + ", " +
+                    "exploitation=" + exploitation + ", " +
+                    "exploration=" + exploration + ", " +
+                    "explorationFactor=" + explorationFactor);
+        }
+        return value;
     }
 }
