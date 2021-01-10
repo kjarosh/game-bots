@@ -35,7 +35,7 @@ public interface MonteCarloTreeSearchHandler<S, M> {
      *
      * @param state the game state to start from
      * @param party the party which should perform the first move
-     * @return the party which won the playout
+     * @return the outcome
      */
-    Party simulatePlayout(S state, Party party);
+    Outcome simulatePlayout(S state, Party party);
 }

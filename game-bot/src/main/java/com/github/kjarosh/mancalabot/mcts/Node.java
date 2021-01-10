@@ -11,7 +11,7 @@ public interface Node {
     /**
      * @return number of playouts won by the party performing the move
      */
-    long getWon();
+    double getWon();
 
     /**
      * @return number of total simulated playouts

@@ -44,21 +44,11 @@ public class MancalaBot {
 
         simulationRunner.run(mcts);
 
-        double prob = -1d;
-        Move move = null;
-        Map<Move, Double> winProbabilities = mcts.getWinProbabilities(Party.MAIN);
-        for (Map.Entry<Move, Double> entry : winProbabilities.entrySet()) {
-            double p = entry.getValue();
-            if (p > prob) {
-                prob = p;
-                move = entry.getKey();
-            }
-        }
-
+        Move move = mcts.getBestMove();
         return MovePrediction.builder()
                 .move(move)
                 .winProbability(mcts.getWinProbability(Party.MAIN))
-                .winProbabilityAfterMove(prob)
+                .winProbabilityAfterMove(mcts.getWinProbabilityAfterMove(move, Party.MAIN))
                 .totalSimulations(mcts.getTotalSimulations())
                 .treeDepthMax(mcts.getMaxDepth())
                 .treeDepthAvg(mcts.getAverageDepth())

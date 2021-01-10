@@ -5,6 +5,7 @@ import com.github.kjarosh.mancalabot.mancala.Move;
 import com.github.kjarosh.mancalabot.mancala.Player;
 import com.github.kjarosh.mancalabot.mancala.Result;
 import com.github.kjarosh.mancalabot.mcts.MonteCarloTreeSearchHandler;
+import com.github.kjarosh.mancalabot.mcts.Outcome;
 import com.github.kjarosh.mancalabot.mcts.Party;
 
 import java.util.Collection;
@@ -15,11 +16,11 @@ import java.util.Random;
  */
 public class MancalaMonteCarloTreeSearchHandler implements MonteCarloTreeSearchHandler<MancalaBoard, Move> {
     private final Random random;
-    private final Player player;
+    private final Player mainParty;
 
-    public MancalaMonteCarloTreeSearchHandler(Random random, Player player) {
+    public MancalaMonteCarloTreeSearchHandler(Random random, Player mainParty) {
         this.random = random;
-        this.player = player;
+        this.mainParty = mainParty;
     }
 
     @Override
@@ -29,13 +30,13 @@ public class MancalaMonteCarloTreeSearchHandler implements MonteCarloTreeSearchH
 
     @Override
     public Collection<Move> possibleMoves(MancalaBoard state, Party party) {
-        return state.getPossibleMoves(party == Party.MAIN ? player : player.opponent());
+        return state.getPossibleMoves(partyToPlayer(party));
     }
 
     @Override
-    public Party simulatePlayout(MancalaBoard state, Party party) {
+    public Outcome simulatePlayout(MancalaBoard state, Party party) {
         MancalaBoard sim = state.copy();
-        Player current = party == Party.MAIN ? player : player.opponent();
+        Player current = partyToPlayer(party);
 
         while (!sim.isFinished()) {
             Move move = sim.randomMove(current, random);
@@ -43,6 +44,15 @@ public class MancalaMonteCarloTreeSearchHandler implements MonteCarloTreeSearchH
             current = current.opponent();
         }
 
-        return sim.resultFor(player) == Result.WIN ? Party.MAIN : Party.OPPONENT;
+        Result result = sim.resultFor(mainParty);
+        return switch (result) {
+            case TIE -> Outcome.TIE;
+            case WIN -> Outcome.MAIN_WON;
+            case LOSE -> Outcome.OPPONENT_WON;
+        };
+    }
+
+    private Player partyToPlayer(Party party) {
+        return party == Party.MAIN ? mainParty : mainParty.opponent();
     }
 }

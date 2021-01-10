@@ -1,5 +1,7 @@
 package com.github.kjarosh.mancalabot.mcts;
 
+import com.github.kjarosh.mancalabot.mcts.util.AtomicDouble;
+
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -35,20 +37,31 @@ public class MonteCarloTreeSearch<S, M> {
         if (leaf.total.get() > 0) leaf.expandChildren();
 
         // simulation
-        Party winner = handler.simulatePlayout(leaf.state, leaf.party);
+        Outcome outcome = handler.simulatePlayout(leaf.state, leaf.party);
 
         // backpropagation
-        leaf.backpropagate(winner);
+        leaf.backpropagate(outcome);
+    }
+
+    public M getBestMove() {
+        long maxTotal = -1;
+        M move = null;
+        for (Map.Entry<M, InternalNode> e : root.children.entrySet()) {
+            long total = e.getValue().getTotal();
+            if (total > maxTotal) {
+                maxTotal = total;
+                move = e.getKey();
+            }
+        }
+        return move;
     }
 
     public double getWinProbability(Party party) {
         return root.getWinProbability(party);
     }
 
-    public Map<M, Double> getWinProbabilities(Party party) {
-        Map<M, Double> prob = new HashMap<>();
-        root.children.forEach((move, node) -> prob.put(move, node.getWinProbability(party)));
-        return prob;
+    public double getWinProbabilityAfterMove(M move, Party party) {
+        return root.children.get(move).getWinProbability(party);
     }
 
     public long getTotalSimulations() {
@@ -69,7 +82,7 @@ public class MonteCarloTreeSearch<S, M> {
         private final Map<M, InternalNode> children = new HashMap<>();
         private final S state;
 
-        private final AtomicLong won = new AtomicLong(0);
+        private final AtomicDouble won = new AtomicDouble(0);
         private final AtomicLong total = new AtomicLong(0);
 
         private volatile boolean expanded = false;
@@ -103,14 +116,16 @@ public class MonteCarloTreeSearch<S, M> {
             return selectedChild.selectLeaf();
         }
 
-        private void backpropagate(Party winner) {
-            if (party == winner) {
-                won.incrementAndGet();
+        private void backpropagate(Outcome outcome) {
+            if (party == outcome.getWinner()) {
+                won.addAndGet(1d);
+            } else if (outcome == Outcome.TIE) {
+                won.addAndGet(0.5d);
             }
             total.incrementAndGet();
 
             if (parent != null) {
-                parent.backpropagate(winner);
+                parent.backpropagate(outcome);
             }
         }
 
@@ -125,7 +140,7 @@ public class MonteCarloTreeSearch<S, M> {
         }
 
         @Override
-        public long getWon() {
+        public double getWon() {
             return won.get();
         }
 
@@ -135,7 +150,7 @@ public class MonteCarloTreeSearch<S, M> {
         }
 
         private double getWinProbability(Party party) {
-            double p = 1d * won.get() / total.get();
+            double p = won.get() / total.get();
             if (this.party != party) {
                 return 1 - p;
             } else {
