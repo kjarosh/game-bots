@@ -65,7 +65,8 @@ public class MonteCarloTreeSearch<S, M> {
     }
 
     public double getWinProbabilityAfterMove(M move, Party party) {
-        return root.children.get(move).getWinProbability(party);
+        InternalNode node = root.children.get(move);
+        return node == null ? Double.NaN : node.getWinProbability(party);
     }
 
     public Map<M, Double> getWinProbabilities(Party party) {

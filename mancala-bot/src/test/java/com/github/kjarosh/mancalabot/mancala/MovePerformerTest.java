@@ -244,4 +244,36 @@ class MovePerformerTest {
         assertEquals(0, afterMove.getMancalaB());
     }
 
+    @Test
+    void noCapture() {
+        MancalaConfig config = MancalaConfig.builder()
+                .pits(4)
+                .stones(1)
+                .captureCapturingStone(true)
+                .build();
+        MancalaBoard board = new MancalaBoardImpl(config);
+        board.setPit(Player.PLAYER_B, 1, 0);
+        board.setPit(Player.PLAYER_A, 0, 2);
+        board.setPit(Player.PLAYER_A, 2, 0);
+
+        // B 0 1 1 0 1
+        // A   2 1 0 1 0
+
+        MancalaBoard afterMove = board.copy();
+        new MovePerformer(afterMove).moveInPlace(new Move(Player.PLAYER_A, 0));
+
+        // B 0 1 1 0 1
+        // A   0 2 1 1 0
+
+        assertEquals(0, afterMove.getPit(Player.PLAYER_A, 0));
+        assertEquals(2, afterMove.getPit(Player.PLAYER_A, 1));
+        assertEquals(1, afterMove.getPit(Player.PLAYER_A, 2));
+        assertEquals(1, afterMove.getPit(Player.PLAYER_A, 3));
+        assertEquals(0, afterMove.getMancalaA());
+        assertEquals(1, afterMove.getPit(Player.PLAYER_B, 0));
+        assertEquals(0, afterMove.getPit(Player.PLAYER_B, 1));
+        assertEquals(1, afterMove.getPit(Player.PLAYER_B, 2));
+        assertEquals(1, afterMove.getPit(Player.PLAYER_B, 3));
+        assertEquals(0, afterMove.getMancalaB());
+    }
 }

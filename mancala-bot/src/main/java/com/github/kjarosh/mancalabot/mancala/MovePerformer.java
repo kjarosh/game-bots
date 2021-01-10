@@ -32,33 +32,37 @@ class MovePerformer {
         placeStones(player, player, pit + 1, stones);
     }
 
-    private void placeStones(Player player, Player pitsOwner, int pit, int stones) {
-        if (stones <= 0) return;
+    private void placeStones(Player player, Player pitsOwner, int pit, int remainingStones) {
+        if (remainingStones <= 0) return;
 
-        while (stones > 0 && pit < config.getPits()) {
-            --stones;
+        while (remainingStones > 0 && pit < config.getPits()) {
+            --remainingStones;
 
             board.addPit(pitsOwner, pit, 1);
             ++pit;
         }
 
-        if (stones == 0 &&
+        if (remainingStones == 0 &&
                 player == pitsOwner &&
                 board.getPit(player, pit - 1) == 1) {
             capture(player, pit - 1);
         }
 
-        if (stones > 0 && player == pitsOwner) {
-            --stones;
+        if (remainingStones > 0 && player == pitsOwner) {
+            --remainingStones;
             board.addMancala(pitsOwner, 1);
         }
 
-        placeStones(player, pitsOwner.opponent(), 0, stones);
+        placeStones(player, pitsOwner.opponent(), 0, remainingStones);
     }
 
     private void capture(Player player, int pit) {
         int otherPit = config.getPits() - pit - 1;
         int captured = board.getPit(player.opponent(), otherPit);
+        if (captured <= 0) {
+            return;
+        }
+
         board.setPit(player.opponent(), otherPit, 0);
 
         if (config.isCaptureCapturingStone()) {

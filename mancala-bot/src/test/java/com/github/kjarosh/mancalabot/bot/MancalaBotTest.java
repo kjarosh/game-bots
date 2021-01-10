@@ -4,7 +4,6 @@ import com.github.kjarosh.mancalabot.mancala.MancalaBoard;
 import com.github.kjarosh.mancalabot.mancala.MancalaConfig;
 import com.github.kjarosh.mancalabot.mancala.Move;
 import com.github.kjarosh.mancalabot.mancala.Player;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 
@@ -80,7 +79,7 @@ class MancalaBotTest {
 
         MancalaBotConfig botConfig = MancalaBotConfig.builder()
                 .sequentialMode(true)
-                .iterations(1000)
+                .iterations(10_000)
                 .build();
         MancalaBot bot = new MancalaBot(random, botConfig);
 
