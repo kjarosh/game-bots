@@ -1,0 +1,4 @@
+#!/bin/bash
+set -e
+JAVA=java
+cd "$(dirname "${BASH_SOURCE[0]}")" && "${JAVA}" -jar mancala-bot-*.jar "$@"

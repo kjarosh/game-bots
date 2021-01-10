@@ -9,7 +9,7 @@
     </formats>
     <fileSets>
         <fileSet>
-            <directory>${project.basedir}</directory>
+            <directory>${project.basedir}/../</directory>
             <outputDirectory>/</outputDirectory>
             <includes>
                 <include>README*</include>
@@ -21,13 +21,17 @@
             <directory>${project.build.directory}</directory>
             <outputDirectory>/</outputDirectory>
             <includes>
-                <include>*.jar</include>
+                <include>mancala-bot-*.jar</include>
                 <include>lib/**/*</include>
             </includes>
         </fileSet>
         <fileSet>
             <directory>${project.build.directory}/site</directory>
             <outputDirectory>docs</outputDirectory>
+        </fileSet>
+        <fileSet>
+            <directory>${project.basedir}/src/dist</directory>
+            <outputDirectory>/</outputDirectory>
         </fileSet>
     </fileSets>
 </assembly>
