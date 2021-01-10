@@ -20,6 +20,5 @@ public class MovePrediction {
     private final double winProbability;
     private final double winProbabilityAfterMove;
     private final long totalSimulations;
-    private final int treeDepthMax;
-    private final double treeDepthAvg;
+    private final int treeDepth;
 }

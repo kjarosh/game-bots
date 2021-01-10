@@ -96,9 +96,13 @@ public class MancalaGameWindow extends Stage {
             throw new IllegalStateException("Wrong player");
         }
 
+        log.debug("Performing move {}", move);
+
         board.set(board.get().move(move));
         Player nextPlayer = turn.get().opponent();
         turn.set(nextPlayer);
+
+        log.debug("Board after move {}", board.get());
 
         boolean ended = board.get().isFinished();
         if (ended) {

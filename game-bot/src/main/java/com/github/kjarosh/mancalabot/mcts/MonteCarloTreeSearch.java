@@ -15,10 +15,10 @@ import java.util.concurrent.atomic.AtomicLong;
  * @author Kamil Jarosz
  */
 public class MonteCarloTreeSearch<S, M> {
+    final InternalNode root;
     private final MonteCarloTreeSearchHandler<S, M> handler;
     private final SelectionStrategy selectionStrategy;
-
-    private final InternalNode root;
+    private int maxDepth = -1;
 
     public MonteCarloTreeSearch(
             SelectionStrategy selectionStrategy,
@@ -26,12 +26,16 @@ public class MonteCarloTreeSearch<S, M> {
             S state) {
         this.selectionStrategy = selectionStrategy;
         this.handler = handler;
-        this.root = new InternalNode(null, Party.OPPONENT, state);
+        this.root = new InternalNode(null, Party.OPPONENT, state, 1);
+    }
+
+    public void setMaxDepth(int maxDepth) {
+        this.maxDepth = maxDepth;
     }
 
     public void nextRound() {
         // selection
-        InternalNode leaf = this.root.selectLeaf();
+        InternalNode leaf = this.root.selectLeaf(1);
 
         // expansion
         leaf.expandChildren();
@@ -74,17 +78,14 @@ public class MonteCarloTreeSearch<S, M> {
         return root.getTotal();
     }
 
-    public int getMaxDepth() {
-        return root.getMaxDepth();
+    public int getSimulationDepth() {
+        return root.getSimulationDepth();
     }
 
-    public double getAverageDepth() {
-        return 1d * root.sumDepths() / root.countLeaves();
-    }
-
-    private class InternalNode implements Node {
+    class InternalNode implements Node {
         private final InternalNode parent;
         private final Party party;
+        private final int depth;
         private final Map<M, InternalNode> children = new HashMap<>();
         private final S state;
 
@@ -93,13 +94,15 @@ public class MonteCarloTreeSearch<S, M> {
 
         private volatile boolean expanded = false;
 
-        private InternalNode(InternalNode parent, Party party, S state) {
+        private InternalNode(InternalNode parent, Party party, S state, int depth) {
             this.state = state;
             this.parent = parent;
             this.party = party;
+            this.depth = depth;
         }
 
         private void expandChildren() {
+            if (maxDepth >= 0 && depth >= maxDepth) return;
             if (expanded) return;
             synchronized (children) {
                 if (expanded) return;
@@ -107,20 +110,21 @@ public class MonteCarloTreeSearch<S, M> {
                 Party movePerformer = party.opponent();
                 handler.possibleMoves(state, movePerformer).forEach(move -> {
                     S newState = handler.applyMove(state, move);
-                    InternalNode child = new InternalNode(this, movePerformer, newState);
+                    InternalNode child = new InternalNode(this, movePerformer, newState, depth + 1);
                     children.put(move, child);
                 });
                 expanded = true;
             }
         }
 
-        private InternalNode selectLeaf() {
+        private InternalNode selectLeaf(int depth) {
             if (!expanded) return this;
             if (children.size() == 0) return this;
+            if (maxDepth >= 0 && depth >= maxDepth) return this;
 
             InternalNode selectedChild = selectionStrategy.select(
                     Collections.unmodifiableCollection(children.values()));
-            return selectedChild.selectLeaf();
+            return selectedChild.selectLeaf(depth + 1);
         }
 
         private void backpropagate(Outcome outcome) {
@@ -165,10 +169,10 @@ public class MonteCarloTreeSearch<S, M> {
             }
         }
 
-        public int getMaxDepth() {
+        public int getSimulationDepth() {
             AtomicInteger maxDepth = new AtomicInteger(0);
             children.forEach((m, n) -> {
-                int md = n.getMaxDepth();
+                int md = n.getSimulationDepth();
                 if (md > maxDepth.get()) {
                     maxDepth.set(md);
                 }

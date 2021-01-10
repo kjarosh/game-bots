@@ -19,6 +19,9 @@ import java.time.Duration;
 @ToString
 public class MancalaBotConfig {
     @Builder.Default
+    private final int maxDepth = -1;
+
+    @Builder.Default
     private final boolean sequentialMode = false;
     private final long iterations;
 

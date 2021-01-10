@@ -55,7 +55,6 @@ class MancalaBotTest {
         assertEquals(1.0, prediction.getWinProbabilityAfterMove());
     }
 
-    @Disabled
     @Test
     void firstMove() {
         MancalaConfig config = MancalaConfig.builder()
@@ -81,7 +80,7 @@ class MancalaBotTest {
 
         MancalaBotConfig botConfig = MancalaBotConfig.builder()
                 .sequentialMode(true)
-                .iterations(10000)
+                .iterations(1000)
                 .build();
         MancalaBot bot = new MancalaBot(random, botConfig);
 

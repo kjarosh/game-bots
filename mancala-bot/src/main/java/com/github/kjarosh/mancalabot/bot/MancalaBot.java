@@ -12,7 +12,6 @@ import com.github.kjarosh.mancalabot.mcts.strategies.UCTSelectionStrategy;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 
-import java.util.Map;
 import java.util.Random;
 
 /**
@@ -41,18 +40,20 @@ public class MancalaBot {
                 new UCTSelectionStrategy(random, 0.5),
                 getHandler(player),
                 board);
+        mcts.setMaxDepth(config.getMaxDepth());
 
         simulationRunner.run(mcts);
 
         Move move = mcts.getBestMove();
-        return MovePrediction.builder()
+        MovePrediction prediction = MovePrediction.builder()
                 .move(move)
                 .winProbability(mcts.getWinProbability(Party.MAIN))
                 .winProbabilityAfterMove(mcts.getWinProbabilityAfterMove(move, Party.MAIN))
                 .totalSimulations(mcts.getTotalSimulations())
-                .treeDepthMax(mcts.getMaxDepth())
-                .treeDepthAvg(mcts.getAverageDepth())
+                .treeDepth(mcts.getSimulationDepth())
                 .build();
+        log.info("Predicted next move: {}", prediction);
+        return prediction;
     }
 
     private MancalaMonteCarloTreeSearchHandler getHandler(Player player) {

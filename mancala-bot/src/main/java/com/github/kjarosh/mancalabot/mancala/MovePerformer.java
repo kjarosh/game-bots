@@ -16,7 +16,7 @@ class MovePerformer {
     }
 
     void moveInPlace(Move move) {
-        log.debug("Performing move {}", move);
+        log.trace("Performing move {}", move);
 
         Player player = move.getPlayer();
         int pit = move.getPit();
@@ -67,7 +67,7 @@ class MovePerformer {
         }
 
         board.addMancala(player, captured);
-        log.debug("Captured {} stones from player {} at pit {}",
+        log.trace("Captured {} stones from player {} at pit {}",
                 captured, player.opponent(), otherPit);
     }
 }
