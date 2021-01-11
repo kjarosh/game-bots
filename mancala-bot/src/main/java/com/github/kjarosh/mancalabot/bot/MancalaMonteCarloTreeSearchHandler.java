@@ -45,11 +45,16 @@ public class MancalaMonteCarloTreeSearchHandler implements MonteCarloTreeSearchH
         }
 
         Result result = sim.resultFor(mainParty);
-        return switch (result) {
-            case TIE -> Outcome.TIE;
-            case WIN -> Outcome.MAIN_WON;
-            case LOSE -> Outcome.OPPONENT_WON;
-        };
+        switch (result) {
+            case TIE:
+                return Outcome.TIE;
+            case WIN:
+                return Outcome.MAIN_WON;
+            case LOSE:
+                return Outcome.OPPONENT_WON;
+        }
+
+        throw new AssertionError();
     }
 
     private Player partyToPlayer(Party party) {

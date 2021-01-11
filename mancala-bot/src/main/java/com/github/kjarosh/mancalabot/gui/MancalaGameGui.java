@@ -81,11 +81,17 @@ public class MancalaGameGui extends GridPane {
     private void updateHeaderText() {
         if (board.get().isFinished()) {
             Result result = board.get().resultFor(Player.PLAYER_A);
-            headerText.setText(switch (result) {
-                case WIN -> "You won!";
-                case LOSE -> "You lost";
-                case TIE -> "A tie";
-            });
+            switch (result) {
+                case WIN:
+                    headerText.setText("You won!");
+                    break;
+                case LOSE:
+                    headerText.setText("You lost");
+                    break;
+                case TIE:
+                    headerText.setText("A tie");
+                    break;
+            }
         } else if (turn.get() == Player.PLAYER_A) {
             headerText.setText("Your turn");
         } else {

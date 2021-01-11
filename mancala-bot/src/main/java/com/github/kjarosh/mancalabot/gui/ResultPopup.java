@@ -10,10 +10,16 @@ import javafx.scene.control.ButtonType;
 public class ResultPopup extends Alert {
     public ResultPopup(Result result) {
         super(AlertType.INFORMATION, null, ButtonType.OK);
-        setHeaderText(switch (result) {
-            case WIN -> "You won! Congratulations";
-            case LOSE -> "You lost :(";
-            case TIE -> "There was a tie";
-        });
+        switch (result) {
+            case WIN:
+                setHeaderText("You won! Congratulations");
+                break;
+            case LOSE:
+                setHeaderText("You lost :(");
+                break;
+            case TIE:
+                setHeaderText("There was a tie");
+                break;
+        }
     }
 }
