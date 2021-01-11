@@ -24,12 +24,10 @@ public class MancalaGuiApplication extends Application {
         Button startButton = new Button();
         startButton.setText("Start game");
         startButton.setOnAction(event -> {
-            primaryStage.hide();
-            Stage gui = new MancalaGameWindow(
+            MancalaGameGui gui = new MancalaGameGui(
                     mancalaConfigPane.toMancalaConfig(),
                     mancalaConfigPane.toBotConfig());
-            gui.show();
-            gui.requestFocus();
+            primaryStage.setScene(new Scene(gui));
         });
         Pane root = new VBox();
         root.setPadding(new Insets(10));

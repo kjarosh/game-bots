@@ -28,13 +28,8 @@ public class MancalaConfigPane extends GridPane {
 
     private final NumberField maxMoveDuration = new NumberField(3);
     private final NumberField threads = new NumberField(4);
-    private final ComboBox<Difficulty> difficulty = new ComboBox<>(FXCollections.observableArrayList(
-            Difficulty.HARMLESS,
-            Difficulty.EASY,
-            Difficulty.MEDIUM,
-            Difficulty.HARD,
-            Difficulty.EXTREME
-    ));
+    private final ComboBox<Difficulty> difficulty = new ComboBox<>(
+            FXCollections.observableArrayList(Difficulty.values()));
 
     public MancalaConfigPane() {
         captureCapturingStone.setSelected(true);

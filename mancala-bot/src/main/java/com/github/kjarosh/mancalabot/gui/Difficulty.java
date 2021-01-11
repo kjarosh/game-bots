@@ -8,6 +8,7 @@ public enum Difficulty {
     EASY(1, "Easy"),
     MEDIUM(2, "Medium"),
     HARD(3, "Hard"),
+    EXPERT(5, "Expert"),
     EXTREME(-1, "Extreme"),
     ;
 
