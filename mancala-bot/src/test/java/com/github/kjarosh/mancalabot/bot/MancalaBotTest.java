@@ -4,6 +4,7 @@ import com.github.kjarosh.mancalabot.mancala.MancalaBoard;
 import com.github.kjarosh.mancalabot.mancala.MancalaConfig;
 import com.github.kjarosh.mancalabot.mancala.Move;
 import com.github.kjarosh.mancalabot.mancala.Player;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 
@@ -54,6 +55,7 @@ class MancalaBotTest {
         assertEquals(1.0, prediction.getWinProbabilityAfterMove());
     }
 
+    @Disabled
     @Test
     void firstMove() {
         MancalaConfig config = MancalaConfig.builder()
